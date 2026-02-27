@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>All Appointments</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f0f2f5; }
+        .container { max-width: 1000px; margin: 50px auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.15); }
+        h1 { text-align: center; color: #333; margin-bottom: 20px; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 10px; border-bottom: 1px solid #ddd; text-align: center; }
+        th { background: #007bff; color: white; }
+        tr:hover { background: #f1f1f1; }
+        .backBtn { display:block; margin:20px auto; background:#007bff; color:white; padding:10px 20px; border-radius:6px; text-decoration:none; width:200px; text-align:center; }
+        .backBtn:hover { background:#0056b3; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>All Appointments</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th><th>Patient</th><th>Age</th><th>Contact</th><th>Doctor</th><th>Profession</th><th>Disease</th><th>Date</th><th>Time</th>
+            </tr>
+        </thead>
+        <tbody id="appointmentsBody"></tbody>
+    </table>
+    <a href="/appointment" class="backBtn">Book New Appointment</a>
+</div>
+
+<script>
+function fetchAppointments(){
+    $.ajax({
+        url: "/get_appointments",
+        method: "GET",
+        success: function(data){
+            let rows = "";
+            data.forEach(app => {
+                rows += `<tr>
+                    <td>${app.id}</td>
+                    <td>${app.patient_name}</td>
+                    <td>${app.age}</td>
+                    <td>${app.contact}</td>
+                    <td>${app.doctor_name}</td>
+                    <td>${app.doctor_profession}</td>
+                    <td>${app.disease}</td>
+                    <td>${app.date}</td>
+                    <td>${app.time}</td>
+                </tr>`;
+            });
+            $("#appointmentsBody").html(rows);
+        },
+        error: function(err){ alert("Failed to fetch data"); console.error(err); }
+    });
+}
+
+$(document).ready(()=>fetchAppointments());
+</script>
+</body>
+</html>

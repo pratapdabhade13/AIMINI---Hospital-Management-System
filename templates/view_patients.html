@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>View Patients</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet">
+<style>
+body { background: #f9f9f9; font-family: Arial, sans-serif; display: flex; justify-content: center; }
+.container { margin: 40px auto; width: 100%; max-width: 1200px; }
+.card { border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); text-align: center; }
+.card img { border-top-left-radius: 15px; border-top-right-radius: 15px; max-width: 100%; height: auto; object-fit: contain; }
+h2 { text-align: center; color: #1E90FF; margin-bottom: 30px; }
+</style>
+</head>
+<body>
+<div class="container">
+    <h2>All Registered Patients</h2>
+    <div class="row g-4" id="patientsContainer"></div>
+</div>
+
+<script>
+function loadPatients(){
+    fetch('/get_patients')
+    .then(res => res.json())
+    .then(data => {
+        let container = document.getElementById('patientsContainer');
+        container.innerHTML = '';
+        data.forEach(patient => {
+            let photoUrl = patient.photo ? '/static/' + patient.photo : 'https://via.placeholder.com/250x200.png?text=No+Photo';
+            container.innerHTML += `
+            <div class="col-md-4 d-flex justify-content-center">
+                <div class="card" style="width: 100%;">
+                    <img src="${photoUrl}" alt="Patient Photo">
+                    <div class="card-body">
+                        <h5 class="card-title">${patient.name}</h5>
+                        <p><b>Age:</b> ${patient.age}</p>
+                        <p><b>Gender:</b> ${patient.gender}</p>
+                        <p><b>Contact:</b> ${patient.contact}</p>
+                        <p><b>Address:</b> ${patient.address}</p>
+                        <p><b>Disease:</b> ${patient.disease}</p>
+                    </div>
+                </div>
+            </div>
+            `;
+        });
+    });
+}
+
+// Initial load & auto-refresh every 3 seconds
+loadPatients();
+setInterval(loadPatients, 3000);
+</script>
+</body>
+</html>

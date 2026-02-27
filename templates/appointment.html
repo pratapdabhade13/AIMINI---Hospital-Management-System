@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Book Appointment</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f0f2f5; }
+        .container { max-width: 500px; margin: 50px auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 8px 20px rgba(0,0,0,0.15); }
+        h1 { text-align: center; color: #333; }
+        label { font-weight: bold; margin-top: 10px; display: block; }
+        input, select, button { width: 100%; padding: 10px; margin-top: 5px; border-radius: 6px; border: 1px solid #ccc; }
+        button { background: #007bff; color: white; font-size: 16px; border: none; margin-top: 20px; cursor: pointer; }
+        button:hover { background: #0056b3; }
+        .successMsg { text-align: center; color: green; margin-top: 15px; display:none; font-weight: bold; }
+        #viewAllBtnContainer { display: none; text-align: center; margin-top: 20px; }
+        #viewAllBtnContainer a { text-decoration: none; background: #28a745; color: white; padding: 10px 20px; border-radius: 6px; }
+        #viewAllBtnContainer a:hover { background: #218838; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Book Appointment</h1>
+    <form id="appointmentForm">
+        <label>Name:</label><input type="text" name="name" required>
+        <label>Age:</label><input type="number" name="age" required>
+        <label>Contact:</label><input type="text" name="contact" required>
+
+        <label>Doctor:</label>
+        <select name="doctor" id="doctorSelect" required>
+            <option value="" disabled selected>Select Doctor</option>
+            {% for doc in doctors %}
+            <option value="{{ doc.name }}">{{ doc.name }}</option>
+            {% endfor %}
+        </select>
+
+        <label>Doctor Profession:</label>
+        <input type="text" name="doctor_profession" id="doctorProfession" placeholder="Select a doctor first" required>
+
+        <label>Disease:</label>
+        <input type="text" name="disease" id="disease" placeholder="Select a doctor first" required>
+
+        <label>Date:</label><input type="date" name="date" required>
+        <label>Time:</label><input type="time" name="time" required>
+        <button type="submit">Book Appointment</button>
+    </form>
+
+    <div class="successMsg" id="successMsg">Appointment booked successfully!</div>
+
+    <!-- Hidden view button, visible only after success -->
+    <div id="viewAllBtnContainer">
+        <a href="/view_appointments">View All Appointments</a>
+    </div>
+</div>
+
+<script>
+const doctorData = {
+    {% for doc in doctors %}
+    "{{ doc.name }}": { profession: "{{ doc.profession }}", disease: "{{ doc.disease }}" },
+    {% endfor %}
+};
+
+$("#doctorSelect").change(function(){
+    const selected = $(this).val();
+    if(selected){
+        $("#doctorProfession").val(doctorData[selected].profession);
+        $("#disease").val(doctorData[selected].disease);
+    } else {
+        $("#doctorProfession, #disease").val("").attr("placeholder","Select a doctor first");
+    }
+});
+
+$("#appointmentForm").submit(function(e){
+    e.preventDefault();
+    $.ajax({
+        url: "/add_appointment",
+        method: "POST",
+        data: $(this).serialize(),
+        success: function(response){
+            if(response.status === "success"){
+                $("#successMsg").fadeIn(300).delay(1500).fadeOut(600);
+                $("#appointmentForm")[0].reset();
+                $("#viewAllBtnContainer").fadeIn(800); // Show button only after success
+            }
+        },
+        error: function(err){
+            alert("Error booking appointment.");
+            console.error(err);
+        }
+    });
+});
+</script>
+</body>
+</html>
